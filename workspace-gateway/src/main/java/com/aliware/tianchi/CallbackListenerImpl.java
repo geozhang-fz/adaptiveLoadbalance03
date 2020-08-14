@@ -5,7 +5,7 @@ import org.apache.dubbo.rpc.listener.CallbackListener;
 
 /**
  * @author daofeng.xjf
- *
+ * <p>
  * 客户端监听器 可选接口 用户可以基于获取获取服务端的推送信息，与 CallbackService 搭配使用
  */
 public class CallbackListenerImpl implements CallbackListener {
@@ -15,31 +15,35 @@ public class CallbackListenerImpl implements CallbackListener {
   @Override
   public void receiveServerMsg(String msg) {
     try {
+      String[] msgs = msg.split(",");
 
-      int s = context.small();
-      int m = context.mid();
-      int l = context.large();
+      String quota = msgs[0];
+      int stateID = Integer.valueOf(msgs[1]);
 
-      String[] strings = msg.split(" ");
+      ProviderStateEnum stateEnum = ProviderStateEnum.getStateFromID(stateID);
+      int sCurWeight = context.getsCurWeight();
+      int mCurWeight = context.getmCurWeight();
+      int lCurWeight = context.getlCurWeight();
 
-      int state = Integer.valueOf(strings[1]);
-      ProviderStateEnum stateEnum = ProviderStateEnum.getFromValue(state);
+      System.out.println(String.format(
+              "Gateway说，provider级别：%s，当前状态：%s",
+              quota, stateEnum.toString())
+      );
 
-      System.out.println(strings[0]
-          + " " + stateEnum.toString()
-          + " " + s
-          + " " + m
-          + " " + l);
+      System.out.println(String.format(
+              "当前动态权重，sCurWeight = %s, mCurWeight = %s, lCurWeight = %s",
+              sCurWeight, mCurWeight, lCurWeight)
+      );
 
-      String provider = strings[0];
-
-      if ("small".equals(provider)) {
+      /* 调整动态权重 */
+      // 如果级别是small，那就调整对应的动态权重sCurWeight
+      if ("small".equals(quota)) {
         context.adjust(stateEnum, Provider.S);
       }
-      if ("medium".equals(provider)) {
+      if ("medium".equals(quota)) {
         context.adjust(stateEnum, Provider.M);
       }
-      if ("large".equals(provider)) {
+      if ("large".equals(quota)) {
         context.adjust(stateEnum, Provider.L);
       }
     } catch (Exception e) {

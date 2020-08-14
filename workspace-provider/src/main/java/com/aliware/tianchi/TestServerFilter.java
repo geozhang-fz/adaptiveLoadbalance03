@@ -7,7 +7,6 @@ import org.apache.dubbo.rpc.Invocation;
 import org.apache.dubbo.rpc.Invoker;
 import org.apache.dubbo.rpc.Result;
 import org.apache.dubbo.rpc.RpcException;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author daofeng.xjf
@@ -17,17 +16,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Activate(group = Constants.PROVIDER)
 public class TestServerFilter implements Filter {
 
-  private Statistics statistics = Statistics.getInstance();
+  private ProviderManager providerManager = ProviderManager.getInstance();
 
   @Override
   public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
     try {
-      statistics.plusRequest();
-      long b = System.currentTimeMillis();
+      // 请求数+1
+      providerManager.incrementRequest();
+      long startTime = System.currentTimeMillis();
+
       Result result = invoker.invoke(invocation);
-      long cost = System.currentTimeMillis() - b;
-      statistics.plusFinished();
-      statistics.plusCost(cost);
+
+      long cost = System.currentTimeMillis() - startTime;
+      providerManager.incrementFinished();
+      providerManager.addCost(cost);
 //      System.out.println(invoker.getUrl().getAddress() + " cost: " + cost);
       return result;
     } catch (Exception e) {

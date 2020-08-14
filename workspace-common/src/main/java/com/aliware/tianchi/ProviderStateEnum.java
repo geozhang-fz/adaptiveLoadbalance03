@@ -1,8 +1,6 @@
 package com.aliware.tianchi;
 
-/**
- * @author zrj CreateDate: 2019/5/29
- */
+
 public enum ProviderStateEnum {
 
   $$$$IDLE(0, 32),
@@ -20,12 +18,13 @@ public enum ProviderStateEnum {
   $6BUSY(12, -7),
   ;
 
-  private int id;
+  private int stateID;
 
+  // value表示不同的state，所对应的调整幅度
   private double value;
 
-  ProviderStateEnum(int id, double value) {
-    this.id = id;
+  ProviderStateEnum(int stateID, double value) {
+    this.stateID = stateID;
     this.value = value;
   }
 
@@ -33,17 +32,17 @@ public enum ProviderStateEnum {
     return value;
   }
 
-  public int getId() {
-    return id;
+  public int getStateID() {
+    return stateID;
   }
 
   public boolean isBusy() {
     return value < 0;
   }
 
-  public static ProviderStateEnum getFromValue(int i) {
+  public static ProviderStateEnum getStateFromID(int stateID) {
     for (ProviderStateEnum stateEnum : ProviderStateEnum.values()) {
-      if (stateEnum.getId() == i) {
+      if (stateEnum.getStateID() == stateID) {
         return stateEnum;
       }
     }

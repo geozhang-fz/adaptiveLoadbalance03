@@ -4,107 +4,107 @@ package com.aliware.tianchi;
 /**
  * @author zrj CreateDate: 2019/5/26
  */
-public class Statistics {
+public class ProviderManager {
 
-  private static Statistics instance = new Statistics();
+  private static ProviderManager instance = new ProviderManager();
 
-  private static String name = System.getProperty("quota");
+  private static String quota = System.getProperty("quota");
 
-  public String getName() {
-    return name;
+  public String getQuota() {
+    return quota;
   }
 
-  public static Statistics getInstance() {
+  public static ProviderManager getInstance() {
     return instance;
   }
 
-  private final Object lock0 = new Object();
+  private final Object lockR = new Object();
 
-  private final Object lock1 = new Object();
+  private final Object lockVR = new Object();
 
-  private final Object lock2 = new Object();
+  private final Object lockTS = new Object();
 
   private volatile long request = 0;
 
-  private volatile long finished = 0;
+  private volatile long validRequest = 0;
 
-  private volatile long totalFinished = 0;
+  private volatile long totalValidRequest = 0;
 
-  private volatile long cost = 0;
+  private volatile long timeSpent = 0;
 
-  private volatile long totalCost = 0;
+  private volatile long totalTimeSpent = 0;
 
   public void clear() {
-    synchronized (lock0) {
+    synchronized (lockR) {
       request = 0;
     }
-    synchronized (lock1) {
-      finished = 0;
+    synchronized (lockVR) {
+      validRequest = 0;
     }
-    synchronized (lock2) {
-      cost = 0;
+    synchronized (lockTS) {
+      timeSpent = 0;
     }
   }
 
-  public void plusRequest() {
-    synchronized (lock0) {
+  public void incrementRequest() {
+    synchronized (lockR) {
       request++;
     }
   }
 
-  public void plusFinished() {
-    synchronized (lock1) {
-      finished++;
+  public void incrementFinished() {
+    synchronized (lockVR) {
+      validRequest++;
     }
   }
 
-  public void plusCost(long n) {
-    synchronized (lock2) {
-      cost = cost + n;
+  public void addCost(long n) {
+    synchronized (lockTS) {
+      timeSpent = timeSpent + n;
     }
   }
 
   public long getRequest() {
-    synchronized (lock0) {
+    synchronized (lockR) {
       return request;
     }
   }
 
-  public long getFinished() {
-    synchronized (lock1) {
-      totalFinished = totalFinished + finished;
-      return finished;
+  public long getValidRequest() {
+    synchronized (lockVR) {
+      totalValidRequest = totalValidRequest + validRequest;
+      return validRequest;
     }
   }
 
-  public long getCost() {
-    synchronized (lock2) {
-      totalCost = totalCost + cost;
-      return cost;
+  public long getTimeSpent() {
+    synchronized (lockTS) {
+      totalTimeSpent = totalTimeSpent + timeSpent;
+      return timeSpent;
     }
   }
 
-  public long getTotalFinished() {
-    synchronized (lock1) {
-      return totalFinished;
+  public long getTotalValidRequest() {
+    synchronized (lockVR) {
+      return totalValidRequest;
     }
   }
 
-  public long getTotalCost() {
-    synchronized (lock2) {
-      return totalCost;
+  public long getTotalTimeSpent() {
+    synchronized (lockTS) {
+      return totalTimeSpent;
     }
   }
 
 
-  private final Object lock_state = new Object();
+  private final Object lockState = new Object();
 
   private volatile ProviderStateEnum stateEnum = ProviderStateEnum.NORMAL;
 
   public ProviderStateEnum setState(double curr, double avg) {
     ProviderStateEnum tmp = state(curr, avg);
 //    boolean tooHot = tooHot();
-    synchronized (lock_state) {
+    synchronized (lockState) {
 //      this.stateEnum = tooHot ? ProviderStateEnum.$1BUSY : tmp;
       this.stateEnum = tmp;
       return stateEnum;
@@ -112,7 +112,7 @@ public class Statistics {
   }
 
   public ProviderStateEnum getStateEnum() {
-      return stateEnum;
+    return stateEnum;
   }
 
   private ProviderStateEnum state(double c, double avg) {
@@ -168,10 +168,10 @@ public class Statistics {
 
   // 启动设置一次
   public void setMax(int max) {
-      this.max = max;
+    this.max = max;
   }
 
   public boolean tooHot(int active) {
-      return max - active < 5;
+    return max - active < 5;
   }
 }

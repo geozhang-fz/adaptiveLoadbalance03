@@ -17,7 +17,7 @@ public class UserLoadBalance implements LoadBalance {
 
   @Override
   public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation)
-      throws RpcException {
+          throws RpcException {
 //    return Strategy.simpleRandom(invokers);
     return Strategy.dynamicRandomWeight(invokers);
   }

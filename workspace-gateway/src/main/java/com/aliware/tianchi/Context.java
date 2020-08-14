@@ -11,97 +11,97 @@ public class Context {
     return instance;
   }
 
-  private volatile int small = 200;
+  private volatile int sCurWeight = 200;
 
-  private volatile int mid = 200;
+  private volatile int mCurWeight = 200;
 
-  private volatile int large = 200;
+  private volatile int lCurWeight = 200;
 
   private final Object lock = new Object();
 
-  private volatile com.aliware.tianchi.ProviderStateEnum s = com.aliware.tianchi.ProviderStateEnum.NORMAL;
+  // s、m、l三个级别的provider服务器的工作状态
+  private volatile ProviderStateEnum s = ProviderStateEnum.NORMAL;
+  private volatile ProviderStateEnum m = ProviderStateEnum.NORMAL;
+  private volatile ProviderStateEnum l = ProviderStateEnum.NORMAL;
 
-  private volatile com.aliware.tianchi.ProviderStateEnum m = com.aliware.tianchi.ProviderStateEnum.NORMAL;
-
-  private volatile com.aliware.tianchi.ProviderStateEnum l = com.aliware.tianchi.ProviderStateEnum.NORMAL;
-
-  public com.aliware.tianchi.ProviderStateEnum getS() {
+  public ProviderStateEnum getS() {
     synchronized (lock) {
       return s;
     }
   }
 
-  public com.aliware.tianchi.ProviderStateEnum getM() {
+  public ProviderStateEnum getM() {
     synchronized (lock) {
       return m;
     }
   }
 
-  public com.aliware.tianchi.ProviderStateEnum getL() {
+  public ProviderStateEnum getL() {
     synchronized (lock) {
       return l;
     }
   }
 
-
-  public void adjust(com.aliware.tianchi.ProviderStateEnum s, Provider provider) {
-//    synchronized (lock) {
-      switch (provider) {
-        case S: {
-          if ((small > 20 && s.isBusy()) || (small < 500 && !s.isBusy())) {
-            small += s.getValue();
-          }
-          this.s = s;
-          break;
-        }
-        case M: {
-          if ((mid > 20 && s.isBusy()) || (mid < 500 && !s.isBusy())) {
-            mid += s.getValue();
-          }
-          this.m = s;
-          break;
-        }
-        case L: {
-          if ((large > 20 && s.isBusy()) || (large < 500 && !s.isBusy())) {
-            large += s.getValue();
-          }
-          this.l = s;
-          break;
-        }
-//      }
-    }
-  }
-
-  public int totalWeight() {
-    synchronized (lock) {
-      return small + mid + large;
-    }
-  }
-
-  public int small() {
-//    synchronized (lock) {
-    return small;
-//    }
-  }
-
-  public int mid() {
-//    synchronized (lock) {
-    return mid;
-//    }
-  }
-
-  public int large() {
-//    synchronized (lock) {
-    return large;
-//    }
-  }
-
-
   enum Provider {
+    // Provider的name
     S,
     M,
     L,
     ;
 
   }
+
+  public void adjust(ProviderStateEnum pState, Provider provider) {
+//    synchronized (lock) {
+    switch (provider) {
+      case S: {
+        if ((sCurWeight > 20 && pState.isBusy()) || (sCurWeight < 500 && !pState.isBusy())) {
+          sCurWeight += pState.getValue();
+        }
+        this.s = pState;
+        break;
+      }
+      case M: {
+        if ((mCurWeight > 20 && pState.isBusy()) || (mCurWeight < 500 && !pState.isBusy())) {
+          mCurWeight += pState.getValue();
+        }
+        this.m = pState;
+        break;
+      }
+      case L: {
+        if ((lCurWeight > 20 && pState.isBusy()) || (lCurWeight < 500 && !pState.isBusy())) {
+          lCurWeight += pState.getValue();
+        }
+        this.l = pState;
+        break;
+      }
+//      }
+    }
+  }
+
+  public int getTotalWeight() {
+    synchronized (lock) {
+      return sCurWeight + mCurWeight + lCurWeight;
+    }
+  }
+
+  public int getsCurWeight() {
+//    synchronized (lock) {
+    return sCurWeight;
+//    }
+  }
+
+  public int getmCurWeight() {
+//    synchronized (lock) {
+    return mCurWeight;
+//    }
+  }
+
+  public int getlCurWeight() {
+//    synchronized (lock) {
+    return lCurWeight;
+//    }
+  }
+
+
 }

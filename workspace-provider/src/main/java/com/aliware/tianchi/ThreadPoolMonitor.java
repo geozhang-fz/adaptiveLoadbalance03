@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
+
 import org.apache.dubbo.common.Constants;
 import org.apache.dubbo.common.extension.ExtensionLoader;
 import org.apache.dubbo.common.store.DataStore;
@@ -16,7 +17,7 @@ public class ThreadPoolMonitor {
 
   private Timer timer = new Timer();
 
-  private static Statistics statistics = Statistics.getInstance();
+  private static ProviderManager providerManager = ProviderManager.getInstance();
 
   DataStore dataStore = ExtensionLoader.getExtensionLoader(DataStore.class).getDefaultExtension();
   Map<String, Object> executors = dataStore.get(Constants.EXECUTOR_SERVICE_COMPONENT_KEY);
@@ -32,7 +33,7 @@ public class ThreadPoolMonitor {
 
       if (executor instanceof ThreadPoolExecutor) {
         ThreadPoolExecutor tp = (ThreadPoolExecutor) executor;
-        statistics.setMax(tp.getMaximumPoolSize());
+        providerManager.setMax(tp.getMaximumPoolSize());
       }
     }
   }

@@ -11,7 +11,7 @@ import org.apache.dubbo.remoting.transport.RequestLimiter;
 public class TestRequestLimiter implements RequestLimiter {
 
 
-  private Statistics statistics = Statistics.getInstance();
+  private ProviderManager providerManager = ProviderManager.getInstance();
   private ThreadPoolMonitor monitor = new ThreadPoolMonitor();
 
   /**
@@ -22,7 +22,7 @@ public class TestRequestLimiter implements RequestLimiter {
   @Override
   public boolean tryAcquire(Request request, int activeTaskCount) {
 
-    boolean tooHot = statistics.tooHot(activeTaskCount);
+    boolean tooHot = providerManager.tooHot(activeTaskCount);
     if (tooHot) {
 //      System.out.println("###### reject ##### " + " " + tooHot);
       return false;
