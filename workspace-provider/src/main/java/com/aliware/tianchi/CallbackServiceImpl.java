@@ -16,50 +16,63 @@ import org.apache.dubbo.rpc.service.CallbackService;
  */
 public class CallbackServiceImpl implements CallbackService {
 
-  private ProviderManager providerManager = ProviderManager.getInstance();
+    private ProviderManager providerManager = ProviderManager.getInstance();
 
-  //
-  private Timer timer = new Timer();
+    //
+    private Timer timer = new Timer();
 
-  /**
-   * key: listener type value: callback listener
-   */
-  private final Map<String, CallbackListener> listeners = new ConcurrentHashMap<>();
+    /**
+     * key: listener type value: callback listener
+     */
+    private final Map<String, CallbackListener> listeners = new ConcurrentHashMap<>();
 
-  public CallbackServiceImpl() {
-    timer.schedule(new TimerTask() {
-      @Override
-      public void run() {
-        if (!listeners.isEmpty()) {
-          long finished = providerManager.getValidRequest();
-          long cost = providerManager.getTimeSpent();
-          long totalFinished = providerManager.getTotalValidRequest();
-          long totalCost = providerManager.getTotalTimeSpent();
+    public CallbackServiceImpl() {
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (!listeners.isEmpty()) {
+                    long validRequest = providerManager.getValidRequest();
+                    long timeSpent = providerManager.getTimeSpent();
+                    long totalValidRequest = providerManager.getTotalValidRequest();
+                    long totalTimeSpent = providerManager.getTotalTimeSpent();
 
-          ProviderStateEnum stateEnum = providerManager.setState(cost * 1.0 / finished, totalCost * 1.0 / totalFinished);
+                    System.out.println(String.format(
+                            "validRequest:%s, timeSpent:%s, totalValidRequest:%s, totalTimeSpent:%s",
+                            validRequest, timeSpent, totalValidRequest, totalTimeSpent));
 
-          for (Map.Entry<String, CallbackListener> entry : listeners.entrySet()) {
-            try {
-              // 发送：provider服务器的级别、工作状态ID
-              String notifyStr = String.format("%s,%s", providerManager.getQuota(), stateEnum.getStateID());
-              // entry.getValue()：获取到该provider服务器对应的监听器
-              // 调用receiveServerMsg()方法推送provider服务器信息
-              entry.getValue().receiveServerMsg(notifyStr);
-            } catch (Throwable t1) {
-              listeners.remove(entry.getKey());
+                    ProviderStateEnum stateEnum = providerManager.updateState(
+                            timeSpent * 1.0 / validRequest,
+                            totalTimeSpent * 1.0 / totalValidRequest);
+
+                    for (Map.Entry<String, CallbackListener> entry : listeners.entrySet()) {
+                        try {
+                            // 发送：provider服务器的级别、工作状态ID
+                            String quota = providerManager.getQuota();
+                            int stateID = stateEnum.getStateID();
+
+                            String notifyStr = String.format("%s,%s", quota, stateID);
+                            System.out.println(String.format(
+                                    "%s级的服务器，当前处于%s级的状态。", quota, stateID));
+
+                            // entry.getValue()：获取到该provider服务器对应的监听器
+                            // 调用receiveServerMsg()方法推送provider服务器信息
+                            entry.getValue().receiveServerMsg(notifyStr);
+
+                        } catch (Throwable t1) {
+                            listeners.remove(entry.getKey());
+                        }
+                    }
+                }
+                providerManager.clear();
             }
-          }
-        }
-        providerManager.clear();
-      }
-    }, 250, 250);
-  }
+        }, 0, 250);
+    }
 
 
-  @Override
-  public void addListener(String key, CallbackListener listener) {
-    listeners.put(key, listener);
-    listener.receiveServerMsg(new Date().toString()); // send notification for change
-  }
+    @Override
+    public void addListener(String key, CallbackListener listener) {
+        listeners.put(key, listener);
+        listener.receiveServerMsg(new Date().toString()); // send notification for change
+    }
 
 }

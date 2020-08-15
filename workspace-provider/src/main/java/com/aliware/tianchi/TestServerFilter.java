@@ -27,10 +27,10 @@ public class TestServerFilter implements Filter {
 
       Result result = invoker.invoke(invocation);
 
-      long cost = System.currentTimeMillis() - startTime;
-      providerManager.incrementFinished();
-      providerManager.addCost(cost);
-//      System.out.println(invoker.getUrl().getAddress() + " cost: " + cost);
+      long timeSpent = System.currentTimeMillis() - startTime;
+      providerManager.incrementValidRequest();
+      providerManager.addTimeSpent(timeSpent);
+//      System.out.println(invoker.getUrl().getAddress() + " timeSpent: " + timeSpent);
       return result;
     } catch (Exception e) {
       throw e;

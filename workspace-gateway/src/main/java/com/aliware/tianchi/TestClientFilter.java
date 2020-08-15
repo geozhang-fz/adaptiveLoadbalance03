@@ -22,8 +22,7 @@ public class TestClientFilter implements Filter {
   @Override
   public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
     try {
-//      if()
-
+//      System.out.println("每次消息都调用我");
       Result result = invoker.invoke(invocation);
 
       return result;

@@ -48,7 +48,6 @@ public class CallbackListenerImpl implements CallbackListener {
       }
     } catch (Exception e) {
       System.out.println(msg);
-      // ignore
     }
   }
 
