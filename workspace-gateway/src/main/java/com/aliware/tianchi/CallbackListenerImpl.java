@@ -21,6 +21,7 @@ public class CallbackListenerImpl implements CallbackListener {
       int stateID = Integer.valueOf(msgs[1]);
 
       ProviderStateEnum stateEnum = ProviderStateEnum.getStateFromID(stateID);
+
       int sCurWeight = context.getsCurWeight();
       int mCurWeight = context.getmCurWeight();
       int lCurWeight = context.getlCurWeight();

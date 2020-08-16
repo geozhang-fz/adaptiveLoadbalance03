@@ -50,7 +50,7 @@ public class CallbackServiceImpl implements CallbackService {
                             String quota = providerManager.getQuota();
                             int stateID = stateEnum.getStateID();
 
-                            String notifyStr = String.format("%s,%s", quota, stateID);
+                            String notifyStr = String.format("%s,%s,%s", quota, stateID, 500);
                             System.out.println(String.format(
                                     "%s级的服务器，当前处于%s级的状态。", quota, stateID));
 
@@ -65,7 +65,7 @@ public class CallbackServiceImpl implements CallbackService {
                 }
                 providerManager.clear();
             }
-        }, 0, 250);
+        }, 0, 2000);
     }
 
 
