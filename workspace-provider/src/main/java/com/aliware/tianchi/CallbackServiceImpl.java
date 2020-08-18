@@ -1,5 +1,6 @@
 package com.aliware.tianchi;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.Timer;
@@ -44,15 +45,20 @@ public class CallbackServiceImpl implements CallbackService {
                             timeSpent * 1.0 / validRequest,
                             totalTimeSpent * 1.0 / totalValidRequest);
 
+                    Date now = new Date();
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    String nowStr = sdf.format(now);
+
                     for (Map.Entry<String, CallbackListener> entry : listeners.entrySet()) {
                         try {
                             // 发送：provider服务器的级别、工作状态ID
                             String quota = providerManager.getQuota();
                             int stateID = stateEnum.getStateID();
 
-                            String notifyStr = String.format("%s,%s,%s", quota, stateID, 500);
+                            String notifyStr = String.format("%s,%s", quota, stateID);
                             System.out.println(String.format(
-                                    "%s级的服务器，当前处于%s级的状态。", quota, stateID));
+                                    "【%s】%s级的服务器，当前处于%s级的状态。",
+                                    nowStr, quota, stateID));
 
                             // entry.getValue()：获取到该provider服务器对应的监听器
                             // 调用receiveServerMsg()方法推送provider服务器信息
@@ -72,7 +78,7 @@ public class CallbackServiceImpl implements CallbackService {
     @Override
     public void addListener(String key, CallbackListener listener) {
         listeners.put(key, listener);
-        listener.receiveServerMsg(new Date().toString()); // send notification for change
+//        listener.receiveServerMsg(new Date().toString()); // send notification for change
     }
 
 }

@@ -3,6 +3,9 @@ package com.aliware.tianchi;
 import com.aliware.tianchi.Context.Provider;
 import org.apache.dubbo.rpc.listener.CallbackListener;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * @author daofeng.xjf
  * <p>
@@ -26,9 +29,13 @@ public class CallbackListenerImpl implements CallbackListener {
       int mCurWeight = context.getmCurWeight();
       int lCurWeight = context.getlCurWeight();
 
+      Date now = new Date();
+      SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+      String nowStr = sdf.format(now);
+
       System.out.println(String.format(
-              "Gateway说，provider级别：%s，当前状态：%s",
-              quota, stateEnum.toString())
+              "【%s】Gateway说，provider级别：%s，当前状态：%s",
+              nowStr, quota, stateEnum.toString())
       );
 
       System.out.println(String.format(
